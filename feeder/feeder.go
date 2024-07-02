@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 var (

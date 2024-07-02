@@ -3,9 +3,9 @@ package types
 import (
 	"time"
 
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	"github.com/NibiruChain/nibiru/x/common/set"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	"github.com/vsc-blockchain/core/x/common/set"
 )
 
 const (

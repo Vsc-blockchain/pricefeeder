@@ -3,9 +3,9 @@ package sources
 import (
 	"time"
 
-	"github.com/NibiruChain/nibiru/x/common/set"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/core/x/common/set"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 // UpdateTick defines the wait time between price updates.

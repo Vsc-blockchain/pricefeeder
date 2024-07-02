@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NibiruChain/nibiru/x/common/set"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
+	"github.com/vsc-blockchain/core/x/common/set"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 var _ io.Writer = (*mockWriter)(nil)

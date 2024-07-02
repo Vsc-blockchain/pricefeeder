@@ -1,4 +1,4 @@
-// Credit: @oleksandrmarkelov https://github.com/NibiruChain/pricefeeder/pull/27
+// Credit: @oleksandrmarkelov https://github.com/vsc-blockchain/pricefeeder/pull/27
 package sources
 
 import (
@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/NibiruChain/nibiru/x/common/set"
-	"github.com/NibiruChain/pricefeeder/metrics"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/core/x/common/set"
+	"github.com/vsc-blockchain/pricefeeder/metrics"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 const (

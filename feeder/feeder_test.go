@@ -9,10 +9,10 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	"github.com/NibiruChain/nibiru/x/common/denoms"
-	"github.com/NibiruChain/pricefeeder/types"
-	mocks "github.com/NibiruChain/pricefeeder/types/mocks"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	"github.com/vsc-blockchain/core/x/common/denoms"
+	"github.com/vsc-blockchain/pricefeeder/types"
+	mocks "github.com/vsc-blockchain/pricefeeder/types/mocks"
 )
 
 func TestRunPanics(t *testing.T) {
@@ -33,7 +33,7 @@ func TestParamsUpdate(t *testing.T) {
 	tf := initFeeder(t)
 	defer tf.feeder.Close()
 	p := types.Params{
-		Pairs:            []asset.Pair{asset.Registry.Pair(denoms.NIBI, denoms.NUSD)},
+		Pairs:            []asset.Pair{asset.Registry.Pair(denoms.VSC, denoms.NUSD)},
 		VotePeriodBlocks: 50,
 	}
 

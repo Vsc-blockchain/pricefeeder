@@ -12,6 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txservice "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	coretypes "github.com/vsc-blockchain/core/types"
 )
 
 func sendTx(
@@ -55,7 +56,7 @@ func sendTx(
 		WithSequence(sequence)
 
 	// sign tx, can't fail
-	err = tx.Sign(txFactory, keyInfo.Name, txBuilder, true)
+	err = tx.Sign(ctx, txFactory, keyInfo.Name, txBuilder, true)
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +85,7 @@ func getAccount(ctx context.Context, authClient Auth, ir codectypes.InterfaceReg
 		return 0, 0, err // if account not found it's pointless to continue
 	}
 
-	var acc authtypes.AccountI
+	var acc coretypes.EthAccountI
 	err = ir.UnpackAny(accRaw.Account, &acc)
 	if err != nil {
 		panic(err)

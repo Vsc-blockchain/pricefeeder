@@ -7,9 +7,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	oracletypes "github.com/NibiruChain/nibiru/x/oracle/types"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
+	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
+	"github.com/vsc-blockchain/pricefeeder/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

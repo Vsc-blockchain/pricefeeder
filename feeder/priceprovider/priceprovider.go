@@ -5,18 +5,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	"github.com/NibiruChain/nibiru/x/common/set"
-	"github.com/NibiruChain/pricefeeder/feeder/priceprovider/sources"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	"github.com/vsc-blockchain/core/x/common/set"
+	"github.com/vsc-blockchain/pricefeeder/feeder/priceprovider/sources"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 var _ types.PriceProvider = (*PriceProvider)(nil)
 
 // PriceProvider implements the types.PriceProvider interface.
 // it wraps a Source and handles conversions between
-// nibiru asset pair to exchange symbols.
+// asset pair to exchange symbols.
 type PriceProvider struct {
 	logger              zerolog.Logger
 	stopSignal          chan struct{}
@@ -29,7 +29,7 @@ type PriceProvider struct {
 }
 
 // NewPriceProvider returns a types.PriceProvider given the price source we want to gather prices from,
-// the mapping between nibiru asset.Pair and the source's symbols, and a zerolog.Logger instance.
+// the mapping between asset.Pair and the source's symbols, and a zerolog.Logger instance.
 func NewPriceProvider(
 	sourceName string,
 	pairToSymbolMap map[asset.Pair]types.Symbol,
@@ -60,7 +60,7 @@ func NewPriceProvider(
 }
 
 // newPriceProvider returns a raw *PriceProvider given a Source implementer, the source name and the
-// map of nibiru asset.Pair to Source's symbols, plus the zerolog.Logger instance.
+// map of asset.Pair to Source's symbols, plus the zerolog.Logger instance.
 // Exists for testing purposes.
 func newPriceProvider(source types.Source, sourceName string, pairToSymbolsMap map[asset.Pair]types.Symbol, logger zerolog.Logger) *PriceProvider {
 	pp := &PriceProvider{

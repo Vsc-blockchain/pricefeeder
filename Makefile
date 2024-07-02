@@ -32,7 +32,7 @@ install:
 ###                               Release                                   ###
 ###############################################################################
 
-PACKAGE_NAME		  := github.com/NibiruChain/pricefeeder
+PACKAGE_NAME		  := github.com/vsc-blockchain/pricefeeder
 GOLANG_CROSS_VERSION  ?= v1.19.4
 
 release:

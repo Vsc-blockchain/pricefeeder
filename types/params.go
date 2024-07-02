@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	oracletypes "github.com/NibiruChain/nibiru/x/oracle/types"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
 )
 
 // ParamsFromOracleParams converts oracletypes.Params into

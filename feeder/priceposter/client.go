@@ -5,10 +5,6 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/NibiruChain/nibiru/app"
-	oracletypes "github.com/NibiruChain/nibiru/x/oracle/types"
-	"github.com/NibiruChain/pricefeeder/metrics"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -18,6 +14,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/core/app"
+	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
+	"github.com/vsc-blockchain/pricefeeder/metrics"
+	"github.com/vsc-blockchain/pricefeeder/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

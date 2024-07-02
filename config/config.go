@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	"github.com/NibiruChain/pricefeeder/feeder/priceprovider/sources"
-	"github.com/NibiruChain/pricefeeder/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/joho/godotenv"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	"github.com/vsc-blockchain/pricefeeder/feeder/priceprovider/sources"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 var defaultExchangeSymbolsMap = map[string]map[asset.Pair]types.Symbol{

@@ -6,10 +6,11 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/go-bip39"
+	"github.com/vsc-blockchain/core/crypto/ethsecp256k1"
 )
 
 var _ keyring.Keyring = (*privKeyKeyring)(nil)
@@ -39,6 +40,7 @@ func GetAuth(mnemonic string) (keyring.Keyring, sdk.ValAddress, sdk.AccAddress) 
 		panic(err)
 	}
 	kr := newPrivKeyKeyring(hex.EncodeToString(priv))
+
 	return kr, sdk.ValAddress(kr.addr), kr.addr
 }
 
@@ -47,7 +49,7 @@ func newPrivKeyKeyring(hexKey string) *privKeyKeyring {
 	if err != nil {
 		panic(err)
 	}
-	key := &secp256k1.PrivKey{
+	key := &ethsecp256k1.PrivKey{
 		Key: b,
 	}
 
@@ -70,11 +72,11 @@ func (p privKeyKeyring) KeyByAddress(address sdk.Address) (*keyring.Record, erro
 	return keyring.NewLocalRecord(p.addr.String(), p.privKey, p.pubKey)
 }
 
-func (p privKeyKeyring) Sign(uid string, msg []byte) ([]byte, cryptotypes.PubKey, error) {
-	return p.SignByAddress(p.addr, msg)
+func (p privKeyKeyring) Sign(uid string, msg []byte, signMode signing.SignMode) ([]byte, cryptotypes.PubKey, error) {
+	return p.SignByAddress(p.addr, msg, signMode)
 }
 
-func (p privKeyKeyring) SignByAddress(address sdk.Address, msg []byte) ([]byte, cryptotypes.PubKey, error) {
+func (p privKeyKeyring) SignByAddress(address sdk.Address, msg []byte, signMode signing.SignMode) ([]byte, cryptotypes.PubKey, error) {
 	if !p.addr.Equals(address) {
 		return nil, nil, fmt.Errorf("key not found")
 	}

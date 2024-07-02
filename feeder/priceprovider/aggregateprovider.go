@@ -3,12 +3,12 @@ package priceprovider
 import (
 	"encoding/json"
 
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	"github.com/NibiruChain/pricefeeder/metrics"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	"github.com/vsc-blockchain/pricefeeder/metrics"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 var _ types.PriceProvider = (*AggregatePriceProvider)(nil)

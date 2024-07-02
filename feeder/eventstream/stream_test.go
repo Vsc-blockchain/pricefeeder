@@ -6,13 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NibiruChain/nibiru/app"
-	testutilcli "github.com/NibiruChain/nibiru/x/common/testutil/cli"
-	"github.com/NibiruChain/nibiru/x/common/testutil/genesis"
-	oracletypes "github.com/NibiruChain/nibiru/x/oracle/types"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"github.com/vsc-blockchain/core/app"
+	testutilcli "github.com/vsc-blockchain/core/x/common/testutil/cli"
+	"github.com/vsc-blockchain/core/x/common/testutil/genesis"
+	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
+	"github.com/vsc-blockchain/pricefeeder/utils"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +29,7 @@ type IntegrationTestSuite struct {
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
-	app.SetPrefixes(app.AccountAddressPrefix)
+	utils.InitSDKConfig()
 
 	s.cfg = testutilcli.BuildNetworkConfig(genesis.NewTestGenesisState(app.MakeEncodingConfig()))
 	network, err := testutilcli.New(

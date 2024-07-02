@@ -1,6 +1,6 @@
 package types
 
-import "github.com/NibiruChain/nibiru/x/common/asset"
+import "github.com/vsc-blockchain/core/x/common/asset"
 
 // PriceProvider defines an exchange API
 // which provides prices for the given assets.

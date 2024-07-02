@@ -7,15 +7,15 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/NibiruChain/nibiru/app"
-	"github.com/NibiruChain/pricefeeder/config"
-	"github.com/NibiruChain/pricefeeder/feeder"
-	"github.com/NibiruChain/pricefeeder/feeder/eventstream"
-	"github.com/NibiruChain/pricefeeder/feeder/priceposter"
-	"github.com/NibiruChain/pricefeeder/feeder/priceprovider"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
+	"github.com/vsc-blockchain/pricefeeder/config"
+	"github.com/vsc-blockchain/pricefeeder/feeder"
+	"github.com/vsc-blockchain/pricefeeder/feeder/eventstream"
+	"github.com/vsc-blockchain/pricefeeder/feeder/priceposter"
+	"github.com/vsc-blockchain/pricefeeder/feeder/priceprovider"
+	"github.com/vsc-blockchain/pricefeeder/utils"
 )
 
 func setupLogger() zerolog.Logger {
@@ -46,10 +46,11 @@ func handleInterrupt(logger zerolog.Logger, f *feeder.Feeder) {
 
 var rootCmd = &cobra.Command{
 	Use:   "pricefeeder",
-	Short: "Pricefeeder daemon for posting prices to Nibiru Chain",
+	Short: "Pricefeeder daemon for posting prices to VSC Chain",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := setupLogger()
-		app.SetPrefixes(app.AccountAddressPrefix)
+
+		utils.InitSDKConfig()
 
 		c := config.MustGet()
 

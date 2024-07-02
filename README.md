@@ -1,10 +1,10 @@
-# NibiruChain/pricefeeder for the Oracle Module
+# vsc-blockchain/pricefeeder for the Oracle Module
 
 <img src="./repo-banner.png">
 
 The `pricefeeder` is a tool developed for Nibiru's [Oracle Module consensus](https://nibiru.fi/docs/ecosystem/oracle/) that runs a process to pull data from various external sources and then broadcasts transactions to vote on exchange rates.
 
-- [NibiruChain/pricefeeder for the Oracle Module](#nibiruchainpricefeeder-for-the-oracle-module)
+- [vsc-blockchain/pricefeeder for the Oracle Module](#nibiruchainpricefeeder-for-the-oracle-module)
   - [Quick Start - Local Development](#quick-start---local-development)
     - [Configuration for the `.env`](#configuration-for-the-env)
     - [Run](#run)
@@ -34,7 +34,7 @@ EXCHANGE_SYMBOLS_MAP='{"bitfinex": {"ubtc:unusd": "tBTCUSD", "ueth:unusd": "tETH
 This would allow you to run `pricefeeder` using a local instance of the network. To set up a local network, you can run:
 
 ```bash
-git clone git@github.com:NibiruChain/nibiru.git
+git clone git@github.com:vsc-blockchain/core.git
 cd nibiru
 git checkout v1.0.3
 make localnet

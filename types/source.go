@@ -1,7 +1,7 @@
 package types
 
 // Source defines a source for price provision.
-// This source has no knowledge of nibiru internals
+// This source has no knowledge of chain internals
 // and mappings across asset.Pair and the Source
 // symbols.
 type Source interface {

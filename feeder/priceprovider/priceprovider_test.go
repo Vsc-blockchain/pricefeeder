@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NibiruChain/nibiru/x/common/asset"
-	"github.com/NibiruChain/nibiru/x/common/denoms"
-	"github.com/NibiruChain/pricefeeder/feeder/priceprovider/sources"
-	"github.com/NibiruChain/pricefeeder/types"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
+	"github.com/vsc-blockchain/core/x/common/asset"
+	"github.com/vsc-blockchain/core/x/common/denoms"
+	"github.com/vsc-blockchain/pricefeeder/feeder/priceprovider/sources"
+	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
 var _ types.Source = (*testAsyncSource)(nil)

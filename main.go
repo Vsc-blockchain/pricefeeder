@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/NibiruChain/pricefeeder/cmd"
+	"github.com/vsc-blockchain/pricefeeder/cmd"
 )
 
 func main() {
