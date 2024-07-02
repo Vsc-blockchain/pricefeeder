@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txservice "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -15,6 +16,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog"
 	"github.com/vsc-blockchain/core/app"
+	"github.com/vsc-blockchain/core/crypto/ethsecp256k1"
+	coretypes "github.com/vsc-blockchain/core/types"
 	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
 	"github.com/vsc-blockchain/pricefeeder/metrics"
 	"github.com/vsc-blockchain/pricefeeder/types"
@@ -73,6 +76,10 @@ func Dial(
 	}
 
 	encoding := app.MakeEncodingConfig()
+	encoding.InterfaceRegistry.RegisterImplementations((*coretypes.EthAccountI)(nil), &coretypes.EthAccount{})
+	encoding.InterfaceRegistry.RegisterImplementations((*cryptotypes.PubKey)(nil), &ethsecp256k1.PubKey{})
+	encoding.InterfaceRegistry.RegisterImplementations((*cryptotypes.PrivKey)(nil), &ethsecp256k1.PrivKey{})
+
 	deps := deps{
 		oracleClient: oracletypes.NewQueryClient(conn),
 		authClient:   authtypes.NewQueryClient(conn),
