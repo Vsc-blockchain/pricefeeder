@@ -33,7 +33,7 @@ func TestParamsUpdate(t *testing.T) {
 	tf := initFeeder(t)
 	defer tf.feeder.Close()
 	p := types.Params{
-		Pairs:            []asset.Pair{asset.Registry.Pair(denoms.VSC, denoms.NUSD)},
+		Pairs:            []asset.Pair{asset.Registry.Pair(denoms.VSG, denoms.NUSD)},
 		VotePeriodBlocks: 50,
 	}
 
