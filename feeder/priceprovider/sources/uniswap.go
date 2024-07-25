@@ -49,29 +49,38 @@ func UniswapPriceUpdate(symbols set.Set[types.Symbol], logger zerolog.Logger) (r
 	rawPrices = make(map[types.Symbol]float64)
 
 	// Get price for ETH/USDT pair
-	ethPriceInUSDT, err := getPrice(client, parsedABI, ethUsdtPairAddress, 18, 6, logger)
+	ethPriceInUSDT, err := getPrice(client, parsedABI, ethUsdtPairAddress, 18, 6, false, logger)
 	if err != nil {
 		logger.Err(err).Msg("failed to fetch price for ETH/USDT")
+		return nil, err
 	} else {
 		logger.Debug().Msg(fmt.Sprintf("fetched price for ETH/USDT: %f", ethPriceInUSDT))
 	}
 
 	// Get price for ETH/USDC pair
-	ethPriceInUSDC, err := getPrice(client, parsedABI, ethUsdcPairAddress, 18, 6, logger)
+	ethPriceInUSDC, err := getPrice(client, parsedABI, ethUsdcPairAddress, 18, 6, true, logger)
 	if err != nil {
 		logger.Err(err).Msg("failed to fetch price for ETH/USDC")
+		return nil, err
 	} else {
 		logger.Debug().Msg(fmt.Sprintf("fetched price for ETH/USDC: %f", ethPriceInUSDC))
 	}
 
 	// Calculate average ETH price in USD
+	// if price diverts too much, return an error
+	if ethPriceInUSDT/ethPriceInUSDC > 1.25 || ethPriceInUSDT/ethPriceInUSDC < 0.8 {
+		logger.Err(fmt.Errorf("price deviation too high: %f/%f", ethPriceInUSDT, ethPriceInUSDC)).Msg("price deviation too high")
+		return nil, fmt.Errorf("price deviation too high: %f/%f", ethPriceInUSDT, ethPriceInUSDC)
+	}
+
 	ethPriceInUSD := (ethPriceInUSDT + ethPriceInUSDC) / 2
 	rawPrices["ETHUSD"] = ethPriceInUSD
 
 	// Get price for VSG/ETH pair
-	vsgPriceInETH, err := getPrice(client, parsedABI, vsgEthPairAddress, 18, 18, logger)
+	vsgPriceInETH, err := getPrice(client, parsedABI, vsgEthPairAddress, 18, 18, false, logger)
 	if err != nil {
 		logger.Err(err).Msg("failed to fetch price for VSG/ETH")
+		return nil, err
 	} else {
 		logger.Debug().Msg(fmt.Sprintf("fetched price for VSG/ETH: %f", vsgPriceInETH))
 	}
@@ -84,7 +93,7 @@ func UniswapPriceUpdate(symbols set.Set[types.Symbol], logger zerolog.Logger) (r
 	return rawPrices, nil
 }
 
-func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, token0Decimals, token1Decimals int64, logger zerolog.Logger) (float64, error) {
+func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, token0Decimals, token1Decimals int64, reverse bool, logger zerolog.Logger) (float64, error) {
 	addr := common.HexToAddress(pairAddress)
 	callData, err := parsedABI.Pack("getReserves")
 	if err != nil {
@@ -114,14 +123,27 @@ func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, t
 
 	reserve0 := new(big.Float).SetInt(reserves.Reserve0)
 	reserve1 := new(big.Float).SetInt(reserves.Reserve1)
+	logger.Debug().Msg(fmt.Sprintf("fetched reserves: %s, %s", reserve0.String(), reserve1.String()))
+
+	if reserve0.Cmp(big.NewFloat(0)) == 0 || reserve1.Cmp(big.NewFloat(0)) == 0 {
+		return 0, fmt.Errorf("one of the reserves is zero")
+	}
 
 	// Adjust for token decimals
 	decimals0 := new(big.Float).SetInt(big.NewInt(0).Exp(big.NewInt(10), big.NewInt(token0Decimals), nil))
 	decimals1 := new(big.Float).SetInt(big.NewInt(0).Exp(big.NewInt(10), big.NewInt(token1Decimals), nil))
 
-	price := new(big.Float).Quo(reserve1, reserve0)
-	price.Quo(price, decimals1)
-	price.Mul(price, decimals0)
+	var price *big.Float
+
+	if reverse {
+		price = new(big.Float).Quo(reserve0, reserve1)
+		price.Quo(price, decimals1)
+		price.Mul(price, decimals0)
+	} else {
+		price = new(big.Float).Quo(reserve1, reserve0)
+		price.Quo(price, decimals1)
+		price.Mul(price, decimals0)
+	}
 
 	priceFloat, _ := price.Float64()
 
