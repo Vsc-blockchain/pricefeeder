@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"math"
 	"math/big"
+	"strconv"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -123,6 +125,8 @@ func newPrevote(prices []types.Price, validator sdk.ValAddress, feeder sdk.AccAd
 
 func float64ToDec(price float64) sdkmath.LegacyDec {
 	// TODO(mercilex): precision for numbers with a lot of decimal digits
-	fmt.Println("floattodec", price, fmt.Sprintf("%.18f", price), fmt.Sprintf("%f", price), sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%.18f", price)))
-	return sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%.18f", price))
+	roundedPrice := math.Round(price*1e18) / 1e18
+	formattedPrice := strconv.FormatFloat(roundedPrice, 'f', 18, 64)
+	fmt.Println("floattodec", price, formattedPrice, fmt.Sprintf("%.18f", price), fmt.Sprintf("%f", price), sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%.18f", price)))
+	return sdkmath.LegacyMustNewDecFromStr(formattedPrice)
 }
