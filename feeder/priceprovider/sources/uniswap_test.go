@@ -1,6 +1,7 @@
 package sources
 
 import (
+	"fmt"
 	"io"
 	"testing"
 
@@ -15,6 +16,7 @@ func TestUniswapPriceUpdate(t *testing.T) {
 		rawPrices, err := UniswapPriceUpdate(set.New[types.Symbol]("VSGUSD"), zerolog.New(io.Discard))
 		require.NoError(t, err)
 		require.Equal(t, 2, len(rawPrices))
+		fmt.Println(rawPrices)
 		require.NotZero(t, rawPrices["ETHUSD"])
 		require.NotZero(t, rawPrices["VSGUSD"])
 	})
