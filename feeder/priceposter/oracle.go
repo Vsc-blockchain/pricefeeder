@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"math/big"
 	"strconv"
+	"strings"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -124,10 +125,24 @@ func newPrevote(prices []types.Price, validator sdk.ValAddress, feeder sdk.AccAd
 func float64ToDec(price float64) sdkmath.LegacyDec {
 	// TODO(mercilex): precision for numbers with a lot of decimal digits
 	formattedPrice := strconv.FormatFloat(price, 'f', -1, 64)
-	if len(formattedPrice) > 18 {
-		formattedPrice = formattedPrice[:18]
+
+	parts := strings.Split(formattedPrice, ".")
+	intPart := parts[0]
+	decPart := ""
+
+	if len(parts) > 1 {
+		decPart = parts[1]
 	}
 
-	//fmt.Println("floattodec", price, formattedPrice, fmt.Sprintf("%.18f", price), fmt.Sprintf("%f", price), sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%.18f", price)))
+	if len(decPart) > 18 {
+		decPart = decPart[:18]
+	}
+
+	if decPart == "" {
+		formattedPrice = intPart
+	} else {
+		formattedPrice = intPart + "." + decPart
+	}
+
 	return sdkmath.LegacyMustNewDecFromStr(formattedPrice)
 }
