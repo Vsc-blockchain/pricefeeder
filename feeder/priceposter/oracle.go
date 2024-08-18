@@ -123,5 +123,6 @@ func newPrevote(prices []types.Price, validator sdk.ValAddress, feeder sdk.AccAd
 
 func float64ToDec(price float64) sdkmath.LegacyDec {
 	// TODO(mercilex): precision for numbers with a lot of decimal digits
-	return sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%f", price))
+	fmt.Println("floattodec", price, fmt.Sprintf("%.18f", price), fmt.Sprintf("%f", price), sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%.18f", price)))
+	return sdkmath.LegacyMustNewDecFromStr(fmt.Sprintf("%.18f", price))
 }

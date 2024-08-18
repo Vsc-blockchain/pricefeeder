@@ -3,7 +3,6 @@ package sources
 import (
 	"context"
 	"fmt"
-	"math"
 	"math/big"
 	"strings"
 
@@ -69,18 +68,13 @@ func UniswapPriceUpdate(symbols set.Set[types.Symbol], logger zerolog.Logger) (r
 
 	// Calculate average ETH price in USD
 	// if price diverts too much, return an error
-	quotCheck := ethPriceInUSDT.Quo(&ethPriceInUSDT, &ethPriceInUSDC)
-	if quotCheck.Cmp(new(big.Float).SetFloat64(1.25)) == 1 || quotCheck.Cmp(new(big.Float).SetFloat64(0.8)) == -1 {
+	if ethPriceInUSDT/ethPriceInUSDC > 1.25 || ethPriceInUSDT/ethPriceInUSDC < 0.8 {
 		logger.Err(fmt.Errorf("price deviation too high: %f/%f", ethPriceInUSDT, ethPriceInUSDC)).Msg("price deviation too high")
 		return nil, fmt.Errorf("price deviation too high: %f/%f", ethPriceInUSDT, ethPriceInUSDC)
 	}
 
-	ethPriceInUSD := new(big.Float).Add(&ethPriceInUSDT, &ethPriceInUSDC)
-	ethPriceInUSD.Quo(ethPriceInUSD, new(big.Float).SetInt64(2))
-
-	rawPrices["ETHUSD"], _ = ethPriceInUSD.Float64()
-
-	fmt.Println("minfloat64", math.SmallestNonzeroFloat64)
+	ethPriceInUSD := (ethPriceInUSDT + ethPriceInUSDC) / 2
+	rawPrices["ETHUSD"] = ethPriceInUSD
 
 	// Get price for VSG/ETH pair
 	vsgPriceInETH, err := getPrice(client, parsedABI, vsgEthPairAddress, 18, 18, false, logger)
@@ -88,24 +82,22 @@ func UniswapPriceUpdate(symbols set.Set[types.Symbol], logger zerolog.Logger) (r
 		logger.Err(err).Msg("failed to fetch price for VSG/ETH")
 		return nil, err
 	} else {
-		logger.Debug().Msg(fmt.Sprintf("fetched price for VSG/ETH: %s", vsgPriceInETH.String()))
+		logger.Debug().Msg(fmt.Sprintf("fetched price for VSG/ETH: %f", vsgPriceInETH))
 	}
 
 	// Calculate VSG price in USD
-	vsgPriceInUSD := new(big.Float).Mul(&vsgPriceInETH, ethPriceInUSD)
-	rawPrices["VSGUSD"], _ = vsgPriceInUSD.Float64()
-
-	fmt.Println("vsgusd", rawPrices["VSGUSD"], vsgPriceInUSD)
+	vsgPriceInUSD := vsgPriceInETH * ethPriceInUSD
+	rawPrices["VSGUSD"] = vsgPriceInUSD
 
 	metrics.PriceSourceCounter.WithLabelValues(Uniswap, "true").Inc()
 	return rawPrices, nil
 }
 
-func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, token0Decimals, token1Decimals int64, reverse bool, logger zerolog.Logger) (big.Float, error) {
+func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, token0Decimals, token1Decimals int64, reverse bool, logger zerolog.Logger) (float64, error) {
 	addr := common.HexToAddress(pairAddress)
 	callData, err := parsedABI.Pack("getReserves")
 	if err != nil {
-		return *big.NewFloat(0), fmt.Errorf("failed to pack call data: %v", err)
+		return 0, fmt.Errorf("failed to pack call data: %v", err)
 	}
 
 	msg := ethereum.CallMsg{
@@ -115,7 +107,7 @@ func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, t
 
 	result, err := client.CallContract(context.Background(), msg, nil)
 	if err != nil {
-		return *big.NewFloat(0), fmt.Errorf("failed to call contract: %v", err)
+		return 0, fmt.Errorf("failed to call contract: %v", err)
 	}
 
 	var reserves struct {
@@ -126,7 +118,7 @@ func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, t
 
 	err = parsedABI.UnpackIntoInterface(&reserves, "getReserves", result)
 	if err != nil {
-		return *big.NewFloat(0), fmt.Errorf("failed to unpack result: %v", err)
+		return 0, fmt.Errorf("failed to unpack result: %v", err)
 	}
 
 	reserve0 := new(big.Float).SetInt(reserves.Reserve0)
@@ -134,7 +126,7 @@ func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, t
 	logger.Debug().Msg(fmt.Sprintf("fetched reserves: %s, %s", reserve0.String(), reserve1.String()))
 
 	if reserve0.Cmp(big.NewFloat(0)) == 0 || reserve1.Cmp(big.NewFloat(0)) == 0 {
-		return *big.NewFloat(0), fmt.Errorf("one of the reserves is zero")
+		return 0, fmt.Errorf("one of the reserves is zero")
 	}
 
 	// Adjust for token decimals
@@ -154,7 +146,6 @@ func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, t
 	}
 
 	priceFloat, _ := price.Float64()
-	logger.Info().Msg(fmt.Sprintf("calculated price: %s, %f", price.String(), priceFloat))
 
-	return *price, nil
+	return priceFloat, nil
 }
