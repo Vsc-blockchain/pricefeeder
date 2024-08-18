@@ -137,13 +137,15 @@ func getPrice(client *ethclient.Client, parsedABI abi.ABI, pairAddress string, t
 
 	if reverse {
 		price = new(big.Float).Quo(reserve0, reserve1)
-		price.Quo(price, decimals1)
 		price.Mul(price, decimals0)
+		price.Quo(price, decimals1)
 	} else {
 		price = new(big.Float).Quo(reserve1, reserve0)
-		price.Quo(price, decimals1)
 		price.Mul(price, decimals0)
+		price.Quo(price, decimals1)
 	}
+
+	logger.Debug().Msg(fmt.Sprintf("calculated price: %s", price.String()))
 
 	priceFloat, _ := price.Float64()
 
