@@ -27,7 +27,7 @@ const (
 	uniswapPairABIJSON = `[{"constant":true,"inputs":[],"name":"getReserves","outputs":[{"internalType":"uint112","name":"_reserve0","type":"uint112"},{"internalType":"uint112","name":"_reserve1","type":"uint112"},{"internalType":"uint32","name":"_blockTimestampLast","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"}]`
 	ethUsdtPairAddress = "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852" // ETH/USDT Uniswap V2 pair contract address
 	ethUsdcPairAddress = "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc" // ETH/USDC Uniswap V2 pair contract address
-	vsgEthPairAddress  = "0x844a5ccdc91e604f55085adfc02e4d52c8227099" // VSG/ETH pair contract address
+	vsgEthPairAddress  = "0x1E9348B71EcBaaa14EFF7B4B6186B78d1A9B9B70" // VSG/ETH pair contract address
 )
 
 // UniswapPriceUpdate returns the prices for given symbols or an error.
