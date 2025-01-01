@@ -20,13 +20,13 @@ type ws struct {
 	connectionClosed *atomic.Bool
 }
 
-func NewWebsocket(url string, onOpenMsg []byte, logger zerolog.Logger) *ws {
+func NewWebsocket(url string, onOpenMsg []byte, messageType int, logger zerolog.Logger) *ws {
 	dialFunction := func() (*websocket.Conn, error) {
 		conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 		if err != nil {
 			return nil, err
 		}
-		return conn, conn.WriteMessage(websocket.BinaryMessage, onOpenMsg)
+		return conn, conn.WriteMessage(messageType, onOpenMsg)
 	}
 
 	ws := &ws{
