@@ -13,6 +13,11 @@ import (
 	"github.com/vsc-blockchain/pricefeeder/types"
 )
 
+const (
+	defaultGrpcEndpoint      = "localhost:9090"
+	defaultWebsocketEndpoint = "ws://localhost:26657/websocket"
+)
+
 var defaultExchangeSymbolsMap = map[string]map[asset.Pair]types.Symbol{
 	// https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1
 	// k-yang: default disable Coingecko because they have aggressive rate limiting
@@ -83,6 +88,13 @@ func Get() (*Config, error) {
 	conf.FeederMnemonic = os.Getenv("FEEDER_MNEMONIC")
 	conf.EnableTLS = os.Getenv("ENABLE_TLS") == "true"
 	conf.ExchangesToPairToSymbolMap = defaultExchangeSymbolsMap
+
+	if conf.GRPCEndpoint == "" {
+		conf.GRPCEndpoint = defaultGrpcEndpoint
+	}
+	if conf.WebsocketEndpoint == "" {
+		conf.WebsocketEndpoint = defaultWebsocketEndpoint
+	}
 
 	overrideExchangeSymbolsMapJson := os.Getenv("EXCHANGE_SYMBOLS_MAP")
 	if overrideExchangeSymbolsMapJson != "" {
