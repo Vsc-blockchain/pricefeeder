@@ -13,6 +13,7 @@ import (
 	"github.com/vsc-blockchain/pricefeeder/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var _ types.EventStream = (*Stream)(nil)
@@ -25,7 +26,7 @@ type wsI interface {
 
 // Dial opens two connections to the given endpoint, one for the websocket and one for the oracle grpc.
 func Dial(tendermintRPCEndpoint string, grpcEndpoint string, enableTLS bool, logger zerolog.Logger) *Stream {
-	transportDialOpt := grpc.WithInsecure()
+	transportDialOpt := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	if enableTLS {
 		transportDialOpt = grpc.WithTransportCredentials(
@@ -42,9 +43,6 @@ func Dial(tendermintRPCEndpoint string, grpcEndpoint string, enableTLS bool, log
 		panic(err)
 	}
 
-	if err != nil {
-		panic(err)
-	}
 	oracleClient := oracletypes.NewQueryClient(conn)
 
 	const newBlockSubscribe = `{"jsonrpc":"2.0","method":"subscribe","id":0,"params":{"query":"tm.event='NewBlock'"}}`
