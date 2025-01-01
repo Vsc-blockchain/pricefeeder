@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
 
 func TestWebsocketSuccess(t *testing.T) {
-	ws := NewWebsocket("wss://echo.websocket.events/.ws", []byte("test"), zerolog.New(os.Stderr))
+	ws := NewWebsocket("wss://echo.websocket.events/.ws", []byte("test"), websocket.BinaryMessage, zerolog.New(os.Stderr))
 	defer ws.close()
 	// LOL this test websocket URL we're using returns the following
 	select {
@@ -29,7 +30,7 @@ func TestWebsocketSuccess(t *testing.T) {
 }
 
 func TestWebsocketExplicitClose(t *testing.T) {
-	ws := NewWebsocket("wss://echo.websocket.events/.ws", []byte("test"), zerolog.New(os.Stderr))
+	ws := NewWebsocket("wss://echo.websocket.events/.ws", []byte("test"), websocket.BinaryMessage, zerolog.New(os.Stderr))
 	require.NotPanics(t, func() {
 		ws.close()
 	})

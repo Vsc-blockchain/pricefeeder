@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
 	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
 	"github.com/vsc-blockchain/pricefeeder/types"
@@ -47,7 +48,7 @@ func Dial(tendermintRPCEndpoint string, grpcEndpoint string, enableTLS bool, log
 	oracleClient := oracletypes.NewQueryClient(conn)
 
 	const newBlockSubscribe = `{"jsonrpc":"2.0","method":"subscribe","id":0,"params":{"query":"tm.event='NewBlock'"}}`
-	ws := NewWebsocket(tendermintRPCEndpoint, []byte(newBlockSubscribe), logger)
+	ws := NewWebsocket(tendermintRPCEndpoint, []byte(newBlockSubscribe), websocket.BinaryMessage, logger)
 	return newStream(ws, oracleClient, logger)
 }
 
