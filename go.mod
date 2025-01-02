@@ -18,7 +18,7 @@ require (
 	github.com/rs/zerolog v1.32.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
-	github.com/vsc-blockchain/core v1.0.0
+	github.com/vsc-blockchain/core v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.63.2
 )
 
@@ -245,7 +245,6 @@ require (
 
 replace (
 	cosmossdk.io/simapp => cosmossdk.io/simapp v0.0.0-20240419084016-a2abf1a442ca
-	github.com/datachainlab/lcp-go => github.com/vsc-blockchain/lcp-go v0.2.11-vsc.0
 	github.com/ethereum/go-ethereum => github.com/ethereum/go-ethereum v1.10.26
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/vsc-blockchain/collections => ../collections

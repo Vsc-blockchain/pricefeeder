@@ -1,4 +1,4 @@
-PACKAGE_NAME		  := github.com/NibiruChain/pricefeeder
+PACKAGE_NAME		  := github.com/vsc-blockchain/pricefeeder
 GOLANG_CROSS_VERSION  ?= v1.19.4
 VERSION ?= $(shell git describe --tags --abbrev=0)
 COMMIT ?= $(shell git rev-parse HEAD)
@@ -28,4 +28,4 @@ run-debug:
 
 .PHONY: build install
 $(BUILD_TARGETS):
-	CGO_ENABLED=0 go $@ -mod=readonly -ldflags="-s -w -X github.com/vsc-blockchain/pricefeeder/cmd.Version=$(VERSION) -X github.com/vsc-blockchain/pricefeeder/cmd.CommitHash=$(COMMIT)" .
+	go $@ -mod=readonly -ldflags="-s -w -X github.com/vsc-blockchain/pricefeeder/cmd.Version=$(VERSION) -X github.com/vsc-blockchain/pricefeeder/cmd.CommitHash=$(COMMIT)" ./...
