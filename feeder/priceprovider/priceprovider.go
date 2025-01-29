@@ -54,6 +54,8 @@ func NewPriceProvider(
 		source = sources.NewTickSource(mapValues(pairToSymbolMap), sources.BybitPriceUpdate, logger)
 	case sources.Uniswap:
 		source = sources.NewTickSource(mapValues(pairToSymbolMap), sources.UniswapPriceUpdate, logger)
+	case sources.Mexc:
+		source = sources.NewTickSource(mapValues(pairToSymbolMap), sources.MexcPriceUpdate, logger)
 	default:
 		panic("unknown price provider: " + sourceName)
 	}
