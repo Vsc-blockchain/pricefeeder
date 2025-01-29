@@ -59,6 +59,9 @@ var defaultExchangeSymbolsMap = map[string]map[asset.Pair]types.Symbol{
 	sources.Mexc: {
 		"avsg:ausd": "VSGUSDT",
 	},
+	sources.Ascendex: {
+		"avsg:ausd": "VSG/USDT",
+	},
 	sources.Uniswap: {
 		"avsg:ausd": "VSGUSD",
 	},
