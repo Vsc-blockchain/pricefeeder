@@ -89,4 +89,27 @@ func TestAggregateThreePrices(t *testing.T) {
 	require.True(t, price.Valid)
 	// Outlier (100000) removed, median of {1000, 2000} is 1500
 	require.Equal(t, 1500.0, price.Price)
+
+	agg = AggregatePriceProvider{
+		logger: zerolog.Nop(),
+		providers: map[int]types.PriceProvider{
+			0: mockProvider{prices: map[asset.Pair]types.Price{
+				btcPair: {Price: 1000.0, Valid: true, SourceName: "mock1"},
+			}},
+			1: mockProvider{prices: map[asset.Pair]types.Price{
+				btcPair: {Price: 2000.0, Valid: true, SourceName: "mock2"},
+			}},
+			2: mockProvider{prices: map[asset.Pair]types.Price{
+				btcPair: {Price: 10000.0, Valid: true, SourceName: "mock3"},
+			}},
+			3: mockProvider{prices: map[asset.Pair]types.Price{
+				btcPair: {Price: 2000.0, Valid: true, SourceName: "mock4"},
+			}},
+		},
+	}
+
+	price = agg.GetPrice(btcPair)
+	require.True(t, price.Valid)
+	// Outlier (100000) removed, median of {1000, 2000, 2000} is 2000
+	require.Equal(t, 2000.0, price.Price)
 }
