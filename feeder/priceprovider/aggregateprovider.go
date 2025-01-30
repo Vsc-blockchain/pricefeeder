@@ -118,7 +118,7 @@ func (a AggregatePriceProvider) removeOutliers(prices []float64, pair asset.Pair
 	mean, stddev := a.meanAndStdDev(prices)
 	var filtered []float64
 	for _, p := range prices {
-		if math.Abs(p-mean) <= 1*stddev {
+		if math.Abs(p-mean) <= 1*stddev { // 2* would be too loose
 			filtered = append(filtered, p)
 			continue
 		}
@@ -151,6 +151,6 @@ func (a AggregatePriceProvider) meanAndStdDev(prices []float64) (float64, float6
 		diff := p - mean
 		variance += diff * diff
 	}
-	variance /= float64(len(prices))
+	variance /= float64(len(prices) - 1)
 	return mean, math.Sqrt(variance)
 }
