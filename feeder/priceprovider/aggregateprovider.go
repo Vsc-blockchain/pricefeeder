@@ -2,7 +2,6 @@ package priceprovider
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"sort"
 
@@ -117,14 +116,12 @@ func computeConsolidatedPrice(prices []types.Price, pair asset.Pair) types.Price
 // removeOutliers removes outliers from the given prices slice.
 func removeOutliers(prices []float64) []float64 {
 	mean, stddev := meanAndStdDev(prices)
-	fmt.Println(mean, stddev)
 	var filtered []float64
 	for _, p := range prices {
 		if math.Abs(p-mean) <= 1*stddev {
 			filtered = append(filtered, p)
 		}
 	}
-	fmt.Println(filtered)
 	return filtered
 }
 
