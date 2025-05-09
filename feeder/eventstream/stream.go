@@ -20,6 +20,7 @@ var _ types.EventStream = (*Stream)(nil)
 type wsI interface {
 	message() <-chan []byte
 	close()
+	reconnect() error
 }
 
 // Dial opens two connections to the given endpoint, one for the websocket and one for the oracle grpc.
@@ -41,9 +42,6 @@ func Dial(tendermintRPCEndpoint string, grpcEndpoint string, enableTLS bool, log
 		panic(err)
 	}
 
-	if err != nil {
-		panic(err)
-	}
 	oracleClient := oracletypes.NewQueryClient(conn)
 
 	const newBlockSubscribe = `{"jsonrpc":"2.0","method":"subscribe","id":0,"params":{"query":"tm.event='NewBlock'"}}`
@@ -87,7 +85,15 @@ func (s *Stream) votingPeriodStartedLoop(ws wsI, logger zerolog.Logger) {
 		select {
 		case <-s.stopSignal:
 			return
-		case msg := <-ws.message():
+		case msg, ok := <-ws.message():
+			if !ok {
+				logger.Warn().Msg("websocket closed, attempting reconnect")
+				if err := ws.reconnect(); err != nil {
+					logger.Err(err).Msg("reconnect failed")
+					time.Sleep(5 * time.Second)
+				}
+				continue
+			}
 			logger.Debug().Bytes("payload", msg).Msg("received message from websocket")
 			blockHeight, err := types.GetBlockHeight(msg)
 			if err != nil {

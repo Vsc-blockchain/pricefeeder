@@ -94,8 +94,8 @@ func (w *ws) connect() {
 		// if we failed to connect, we wait and try again
 		w.logger.Err(err).Msg("failed to connect to websocket")
 		retries++
-		if retries > 10 {
-			// if we failed to connect more than 10 times, we exit
+		if retries > 20 {
+			// if we failed to connect more than 20 times, we exit
 			w.logger.Fatal().Msg("failed to connect to websocket")
 		}
 
@@ -103,6 +103,19 @@ func (w *ws) connect() {
 		time.Sleep(delay)
 		delay *= 2
 	}
+}
+
+func (w *ws) reconnect() error {
+	w.logger.Debug().Msg("reconnecting")
+	w.connectionClosed.Store(true)
+	if w.connection != nil {
+		if err := w.connection.Close(); err != nil {
+			w.logger.Err(err).Msg("close error")
+		}
+	}
+	w.connect()
+	w.connectionClosed.Store(false)
+	return nil
 }
 
 func (w *ws) message() <-chan []byte {
