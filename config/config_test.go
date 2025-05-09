@@ -1,13 +1,16 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/vsc-blockchain/pricefeeder/utils"
 )
+
+func init() {
+	app.SetPrefixes(app.AccountAddressPrefix)
+}
 
 func TestConfig_Get(t *testing.T) {
 
@@ -35,7 +38,6 @@ func TestConfig_Without_EXCHANGE_SYMBOLS_MAP(t *testing.T) {
 	os.Setenv("FEEDER_MNEMONIC", "earth wash broom grow recall fitness")
 	utils.InitSDKConfig()
 	os.Setenv("VALIDATOR_ADDRESS", "nibivaloper1d7zygazerfwx4l362tnpcp0ramzm97xvv9ryxr")
-	cfg, err := Get()
-	fmt.Println(cfg)
+	_, err := Get()
 	require.NoError(t, err)
 }
