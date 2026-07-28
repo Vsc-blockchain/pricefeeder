@@ -41,27 +41,24 @@ version:
 ###                               Release                                   ###
 ###############################################################################
 
-PACKAGE_NAME		  := github.com/vsc-blockchain/pricefeeder
-GOLANG_CROSS_VERSION  ?= v1.19.4
+PACKAGE_NAME := github.com/vsc-blockchain/pricefeeder
+RELEASE_DIR  ?= build
+RELEASE_BIN  := $(RELEASE_DIR)/pricefeeder-$(VERSION)-linux-amd64
 
-release:
-	docker run \
-		--rm \
-		--platform=linux/amd64 \
-		-v "$(CURDIR)":/go/src/$(PACKAGE_NAME) \
-		-w /go/src/$(PACKAGE_NAME) \
-		-e CGO_ENABLED=1 \
-		-e GITHUB_TOKEN=${GITHUB_TOKEN} \
-		goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
-		release --rm-dist
-
-release-snapshot:
-	docker run \
-		--rm \
-		--platform=linux/amd64 \
-		-v "$(CURDIR)":/go/src/$(PACKAGE_NAME) \
-		-w /go/src/$(PACKAGE_NAME) \
-		-e CGO_ENABLED=1 \
-		-e GITHUB_TOKEN=${GITHUB_TOKEN} \
-		goreleaser/goreleaser-cross:${GOLANG_CROSS_VERSION} \
-		release --rm-dist --snapshot
+# Portable release binary: statically linked, no libc dependency, runs on any
+# linux/amd64 distro (Debian, Ubuntu, Alpine, distroless, ...).
+#
+# CGO cannot be turned off here: the dependency graph reaches go-ethereum's cgo
+# secp256k1 via lcp-go, which calls secp256k1.RecoverPubkey and has no pure-Go
+# fallback, so CGO_ENABLED=0 fails to build. Static linking against glibc would
+# normally break DNS and user lookups, which is what the netgo and osusergo tags
+# take care of by using Go's own resolver instead of the platform's.
+.PHONY: release-static
+release-static:
+	mkdir -p $(RELEASE_DIR)
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -mod=readonly -trimpath \
+		-tags netgo,osusergo \
+		-ldflags '-s -w -linkmode external -extldflags "-static" $(LDFLAGS)' \
+		-o $(RELEASE_BIN) .
+	cd $(RELEASE_DIR) && sha256sum $(notdir $(RELEASE_BIN)) > $(notdir $(RELEASE_BIN)).sha256
+	@file $(RELEASE_BIN)
