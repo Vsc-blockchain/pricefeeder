@@ -59,12 +59,10 @@ var defaultExchangeSymbolsMap = map[string]map[asset.Pair]types.Symbol{
 	sources.Mexc: {
 		"avsg:ausd": "VSGUSDT",
 	},
-	sources.Ascendex: {
-		"avsg:ausd": "VSG/USDT",
-	},
-	/*sources.Uniswap: {
-		"avsg:ausd": "VSGUSD",
-	},*/
+	// The vscdex source is intentionally not defaulted here: it needs an RPC
+	// endpoint and pool addresses from DATASOURCE_CONFIG_MAP, and which pool is
+	// fit to serve as an oracle source is a deployment decision. Configure it
+	// via EXCHANGE_SYMBOLS_MAP together with DATASOURCE_CONFIG_MAP.
 }
 
 func MustGet() *Config {

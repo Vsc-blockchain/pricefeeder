@@ -29,7 +29,10 @@ func BitfinexSymbolCsv(symbols set.Set[types.Symbol]) string {
 // BitfinexPriceUpdate returns the prices given the symbols or an error.
 func BitfinexPriceUpdate(symbols set.Set[types.Symbol], logger zerolog.Logger) (rawPrices map[types.Symbol]float64, err error) {
 	type ticker []interface{}
-	const size = 11
+	// minSize is the number of fields Bitfinex documents for a trading pair
+	// ticker. Bitfinex appends new fields over time, so we only require the
+	// prefix we actually read.
+	const minSize = 11
 	const lastPriceIndex = 7
 	const symbolNameIndex = 0
 
@@ -59,13 +62,23 @@ func BitfinexPriceUpdate(symbols set.Set[types.Symbol], logger zerolog.Logger) (
 
 	rawPrices = make(map[types.Symbol]float64)
 	for _, ticker := range tickers {
-		if len(ticker) != size {
-			return nil, fmt.Errorf("impossible to parse ticker size %d, %#v", len(ticker), ticker) // TODO(mercilex): return or log and continue?
+		// one malformed ticker must not take down every other symbol of this source
+		if len(ticker) < minSize {
+			logger.Err(fmt.Errorf("impossible to parse ticker size %d, %#v", len(ticker), ticker)).Msg("skipping malformed ticker")
+			continue
 		}
-		symbol := types.Symbol(ticker[symbolNameIndex].(string))
-		lastPrice := ticker[lastPriceIndex].(float64)
+		symbol, ok := ticker[symbolNameIndex].(string)
+		if !ok {
+			logger.Err(fmt.Errorf("unexpected symbol type in ticker %#v", ticker)).Msg("skipping malformed ticker")
+			continue
+		}
+		lastPrice, ok := ticker[lastPriceIndex].(float64)
+		if !ok {
+			logger.Err(fmt.Errorf("unexpected price type in ticker %#v", ticker)).Msg("skipping malformed ticker")
+			continue
+		}
 
-		rawPrices[symbol] = lastPrice
+		rawPrices[types.Symbol(symbol)] = lastPrice
 		logger.Debug().Msg(fmt.Sprintf("fetched price for %s on data source %s: %f", symbol, Bitfinex, lastPrice))
 	}
 
