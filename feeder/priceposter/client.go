@@ -16,7 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog"
 	"github.com/vsc-blockchain/core/app"
-	"github.com/vsc-blockchain/core/crypto/ethsecp256k1"
+	"github.com/cosmos/evm/crypto/ethsecp256k1"
 	coretypes "github.com/vsc-blockchain/core/types"
 	oracletypes "github.com/vsc-blockchain/core/x/oracle/types"
 	"github.com/vsc-blockchain/pricefeeder/metrics"
