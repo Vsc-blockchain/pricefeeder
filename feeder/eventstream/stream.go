@@ -16,9 +16,17 @@ import (
 
 var _ types.EventStream = (*Stream)(nil)
 
+// BlockTimeout is how long the stream waits for a new block before it assumes
+// the node's NewBlock subscription is dead and forces the websocket to re-dial.
+// CometBFT can drop a subscription (for instance after flagging us as a slow
+// consumer) while leaving the socket itself perfectly healthy, in which case
+// nothing else in the pipeline would ever notice that blocks stopped arriving.
+var BlockTimeout = 60 * time.Second
+
 // wsI exists for testing purposes.
 type wsI interface {
 	message() <-chan []byte
+	reset()
 	close()
 }
 
@@ -83,10 +91,27 @@ func (s *Stream) votingPeriodStartedLoop(ws wsI, logger zerolog.Logger) {
 		ws.close()
 	}()
 
+	// Watchdog for a subscription that stopped delivering blocks. It fires at
+	// half the timeout so a genuinely stalled stream is caught within one
+	// BlockTimeout window rather than two.
+	watchdog := time.NewTicker(BlockTimeout / 2)
+	defer watchdog.Stop()
+	lastBlock := time.Now()
+
 	for {
 		select {
 		case <-s.stopSignal:
 			return
+		case <-watchdog.C:
+			since := time.Since(lastBlock)
+			if since < BlockTimeout {
+				break
+			}
+			logger.Warn().Dur("since-last-block", since).Msg("no new block received, resetting websocket")
+			// Push the marker forward so we re-dial once per timeout window
+			// rather than on every tick while the node is down.
+			lastBlock = time.Now()
+			ws.reset()
 		case msg := <-ws.message():
 			logger.Debug().Bytes("payload", msg).Msg("received message from websocket")
 			blockHeight, err := types.GetBlockHeight(msg)
@@ -95,9 +120,12 @@ func (s *Stream) votingPeriodStartedLoop(ws wsI, logger zerolog.Logger) {
 				break
 			}
 			if blockHeight <= 0 {
-				logger.Err(err).Uint64("block-height", blockHeight).Msg("invalid block height")
+				// Not a NewBlock event: the subscribe ack and any error
+				// response from the node land here.
+				logger.Debug().Bytes("payload", msg).Msg("message carries no block height")
 				break
 			}
+			lastBlock = time.Now()
 			p := s.params.Load()
 			if p == nil {
 				break

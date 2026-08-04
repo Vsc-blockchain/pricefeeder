@@ -37,7 +37,9 @@ func vote(
 		if err != nil {
 			return nil, err
 		}
-		logger.Info().Interface("vote", voteMsg).Msg("prepared vote message")
+		if voteMsg != nil {
+			logger.Info().Interface("vote", voteMsg).Msg("prepared vote message")
+		}
 	}
 	// once we prepared the vote msg we can send the tx
 	var msgs = []sdk.Msg{newPrevote.msg}
