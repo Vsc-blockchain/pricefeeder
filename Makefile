@@ -35,11 +35,11 @@ run-debug:
 ###############################################################################
 
 .PHONY: build
-build:
+build: deps-preflight
 	go build -mod=readonly -ldflags "$(LDFLAGS)" ./...
 
 .PHONY: install
-install:
+install: deps-preflight
 	go install -mod=readonly -ldflags "$(LDFLAGS)" ./...
 
 .PHONY: version
@@ -81,17 +81,27 @@ release: release-preflight
 	@echo
 
 # Fails early with an actionable message instead of letting the build die deep
-# inside the module graph.
+# inside the module graph. Every build target depends on this, because the
+# failure it catches is a machine setup problem that the raw go error describes
+# only as an unreadable username prompt.
+.PHONY: deps-preflight
+deps-preflight:
+	@go mod download github.com/vsc-blockchain/core 2>/dev/null || { \
+		echo "cannot fetch the private module github.com/vsc-blockchain/core."; \
+		echo; \
+		echo "with an ssh deploy key that can read vsc-blockchain/core:"; \
+		echo "  git config --global url.\"git@github.com:\".insteadOf \"https://github.com/\""; \
+		echo; \
+		echo "or with a personal access token (repo scope):"; \
+		echo "  echo 'machine github.com login <user> password <token>' > ~/.netrc"; \
+		echo "  chmod 600 ~/.netrc"; \
+		exit 1; }
+
 .PHONY: release-preflight
-release-preflight:
+release-preflight: deps-preflight
 	@command -v gcc >/dev/null 2>&1 || { \
 		echo "release needs a C compiler (CGO is required, see below)."; \
 		echo "  debian/ubuntu: apt install build-essential"; \
-		exit 1; }
-	@go mod download github.com/vsc-blockchain/core 2>/dev/null || { \
-		echo "cannot fetch the private module github.com/vsc-blockchain/core."; \
-		echo "give git an ssh deploy key once:"; \
-		echo "  git config --global url.\"git@github.com:\".insteadOf \"https://github.com/\""; \
 		exit 1; }
 
 # Kept so that existing scripts and muscle memory do not break.
